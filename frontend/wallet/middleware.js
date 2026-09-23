@@ -27,6 +27,7 @@ export function middleware(request) {
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com",
     [
+      "connect-src",
       "'self'",
       "https://horizon-testnet.stellar.org",
       "https://horizon.stellar.org",
@@ -34,6 +35,9 @@ export function middleware(request) {
       "https://friendbot.stellar.org",
       "https://vlnwwekmukgoretgdkcj.supabase.co",
       "https://lens-ldtu.onrender.com",
+      "https://api.soroswap.finance",
+      "https://open.er-api.com",
+      "https://raw.githubusercontent.com",
       "https://relay.walletconnect.com",
       "wss://relay.walletconnect.com",
       ...origins,
