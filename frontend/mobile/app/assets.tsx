@@ -18,6 +18,7 @@ export default function AssetsScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [state, setState] = useState<State>({ kind: 'loading' });
+  const [showUnverified, setShowUnverified] = useState(false);
 
   const load = useCallback(async () => {
     setState({ kind: 'loading' });
@@ -46,7 +47,9 @@ export default function AssetsScreen() {
       </View>
       <Text style={styles.subtitle}>Every asset your wallet holds beyond XLM.</Text>
 
-      {state.kind === 'loading' && <ActivityIndicator color={colors.accent} style={styles.spinner} />}
+      {state.kind === 'loading' && (
+        <ActivityIndicator color={colors.accent} style={styles.spinner} />
+      )}
 
       {state.kind === 'no-wallet' && (
         <Text style={styles.muted}>No wallet found on this device yet.</Text>
@@ -61,9 +64,28 @@ export default function AssetsScreen() {
           </Text>
         ) : (
           <View style={styles.list}>
-            {state.assets.map((asset) => (
-              <AssetRow key={`${asset.code}-${asset.issuer}`} asset={asset} />
-            ))}
+            {state.assets
+              .filter((asset) => asset.verification.verified)
+              .map((asset) => (
+                <AssetRow key={`${asset.code}-${asset.issuer}`} asset={asset} />
+              ))}
+            {state.assets.some((asset) => !asset.verification.verified) && (
+              <>
+                <Text
+                  style={styles.sectionLabel}
+                  onPress={() => setShowUnverified((open) => !open)}
+                >
+                  {showUnverified ? 'Hide' : 'Show'} unverified (
+                  {state.assets.filter((asset) => !asset.verification.verified).length})
+                </Text>
+                {showUnverified &&
+                  state.assets
+                    .filter((asset) => !asset.verification.verified)
+                    .map((asset) => (
+                      <AssetRow key={`${asset.code}-${asset.issuer}`} asset={asset} />
+                    ))}
+              </>
+            )}
           </View>
         ))}
     </ScrollView>
@@ -108,5 +130,11 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.dangerSurface,
       borderRadius: 8,
       padding: 10,
+    },
+    sectionLabel: {
+      color: colors.textSecondary,
+      fontSize: 13,
+      fontWeight: '600',
+      paddingVertical: 8,
     },
   });

@@ -12,6 +12,8 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Horizon } from '@stellar/stellar-sdk';
+import { verifyAsset, type AssetVerification } from './assetRegistry';
+import { getNetwork } from './network';
 
 /** AsyncStorage key holding the active wallet's public key (shared with backupFile). */
 export const WALLET_PUBLIC_KEY_KEY = 'invisible_wallet_public_key';
@@ -33,6 +35,7 @@ export interface HeldAsset {
   issuer: string;
   balance: string;
   assetType: string;
+  verification: AssetVerification;
 }
 
 /**
@@ -42,15 +45,18 @@ export interface HeldAsset {
  */
 export function parseHeldAssets(balances: HorizonBalanceLike[]): HeldAsset[] {
   return balances
-    .filter(
-      (b) => b.asset_type === 'credit_alphanum4' || b.asset_type === 'credit_alphanum12',
-    )
+    .filter((b) => b.asset_type === 'credit_alphanum4' || b.asset_type === 'credit_alphanum12')
     .filter((b) => b.asset_code && b.asset_issuer)
     .map((b) => ({
       code: b.asset_code as string,
       issuer: b.asset_issuer as string,
       balance: b.balance,
       assetType: b.asset_type,
+      verification: verifyAsset(
+        b.asset_code as string,
+        b.asset_issuer as string,
+        getNetwork().name
+      ),
     }));
 }
 
