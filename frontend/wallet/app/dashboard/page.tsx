@@ -7,68 +7,32 @@ import { inclusionFee } from "@/lib/fees";
 import { Suspense, useEffect, useRef, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Horizon,
-  Keypair,
-  rpc as SorobanRpc,
-  Contract,
-  Account,
-  TransactionBuilder,
-  BASE_FEE,
-  Networks,
-  Asset,
-  nativeToScVal,
-  scValToNative,
-} from "@stellar/stellar-sdk";
-const Server = Horizon.Server;
-import { ConnectDAppModal } from "@/components/ConnectDAppModal";
-import { WalletConnectApprovalModal } from "@/components/WalletConnectApprovalModal";
-import { DepositModal } from "@/components/DepositModal";
-import { TxDetailSheet, type TxRecord } from "@/components/TxDetailSheet";
-import { useInactivityLock } from "@/hooks/useInactivityLock";
-import {
-  ensureFeePayer,
-  isFeePayerPrfDowngrade,
-  getFeePayerDiagnostics,
-} from "@/lib/feePayer";
-import { fetchPrices } from "@/lib/fetchPrice";
-import {
-  change24h,
-  historyKey,
-  isComparableTotal,
-  readHistory,
-  recordSnapshot,
-  writeHistory,
-} from "@/lib/balanceHistory";
-import {
-  buildFriendbotUrl,
-  getNativeAssetContractId,
-  getNetwork,
-  getNetworkName,
-  walletConfig,
-} from "@/lib/network";
-import { isMultisigAvailable } from "@/lib/multisigConfig";
-import { sweepContractBalance } from "@/lib/sweepContractBalance";
-import { derToRawSignature, hexToUint8Array } from "@veil/utils";
-import { useInvisibleWallet, type WebAuthnSignature } from "@veil/sdk";
-import { ensureWalletDeployed } from "@/lib/walletDeployment";
-import {
-  getDueSchedules,
-  updateSchedule,
-  advanceNextRun,
-  type PaymentSchedule,
-} from "@/lib/schedules";
-import { VeilMark } from "@/components/ui/VeilMark";
-import { Amount, Label, Row, TokenIcon } from "@/components/ui/primitives";
-import { formatFiat, hydrateCurrency, useCurrency } from "@/lib/currency";
-import {
-  useActivityFeed,
-  initActivityFeed,
-  hydrateActivityFeed,
-  appendActivityFeed,
-} from "@/lib/activityFeed";
-import { verifyAsset, type AssetVerification } from "@/lib/assetRegistry";
+  Horizon, Keypair, rpc as SorobanRpc, Contract, Account,
+  TransactionBuilder, BASE_FEE, Networks, Asset, nativeToScVal, scValToNative,
+} from '@stellar/stellar-sdk'
+const Server = Horizon.Server
+import { ConnectDAppModal } from '@/components/ConnectDAppModal'
+import { WalletConnectApprovalModal } from '@/components/WalletConnectApprovalModal'
+import { DepositModal } from '@/components/DepositModal'
+import { TxDetailSheet, type TxRecord } from '@/components/TxDetailSheet'
+import { PrivateBalanceCard } from '@/components/PrivateBalanceCard'
+import { useInactivityLock } from '@/hooks/useInactivityLock'
+import { ensureFeePayer, isFeePayerPrfDowngrade, getFeePayerDiagnostics } from '@/lib/feePayer'
+import { fetchPrices } from '@/lib/fetchPrice'
+import { change24h, historyKey, isComparableTotal, readHistory, recordSnapshot, writeHistory } from '@/lib/balanceHistory'
+import { buildFriendbotUrl, getNativeAssetContractId, getNetwork, getNetworkName, walletConfig } from '@/lib/network'
+import { isMultisigAvailable } from '@/lib/multisigConfig'
+import { sweepContractBalance } from '@/lib/sweepContractBalance'
+import { derToRawSignature, hexToUint8Array } from '@veil/utils'
+import { useInvisibleWallet, type WebAuthnSignature } from '@veil/sdk'
+import { ensureWalletDeployed } from '@/lib/walletDeployment'
+import { getDueSchedules, updateSchedule, advanceNextRun, type PaymentSchedule } from '@/lib/schedules'
+import { VeilMark } from '@/components/ui/VeilMark'
+import { Amount, Label, Row, TokenIcon } from '@/components/ui/primitives'
+import { formatFiat, hydrateCurrency, useCurrency } from '@/lib/currency'
+import { useActivityFeed, initActivityFeed, hydrateActivityFeed, appendActivityFeed } from '@/lib/activityFeed'
 
-const network = getNetwork();
+const network = getNetwork()
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1273,42 +1237,9 @@ function DashboardPageContent() {
             </div>
           </div>
 
-          <div
-            className="vw-panel"
-            style={{ flex: 1, minWidth: 0, padding: "26px 28px" }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-                gap: "12px",
-              }}
-            >
-              <div className="vw-label">Earning</div>
-              <div className="vw-meta">Blend USDC pool</div>
-            </div>
-            <p
-              style={{
-                fontSize: "14px",
-                color: "rgba(246,247,248,0.6)",
-                lineHeight: 1.7,
-                marginTop: "16px",
-              }}
-            >
-              Idle USDC can earn in the Blend pool. Nothing is deposited
-              automatically — you approve every move with your passkey.
-            </p>
-            <div style={{ flex: 1 }} />
-            <button
-              className="vw-pill"
-              style={{ alignSelf: "flex-start", marginTop: "18px" }}
-              onClick={() => router.push("/earn")}
-            >
-              Open earn
-            </button>
-          </div>
-        </div>
+        {/* ── Shielded pool balance. Flag-gated inside the card (V131); the
+            scan stub below stands in for the V134 client until it lands. */}
+        <PrivateBalanceCard balances={[]} syncState="syncing" hideAmounts={hideAmounts} />
 
         {/* ── Two columns below the balance: assets wide on the left,
             activity and the agent narrow on the right, as the design has it.
