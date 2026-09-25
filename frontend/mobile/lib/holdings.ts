@@ -1,7 +1,7 @@
 import { Horizon, StrKey } from '@stellar/stellar-sdk';
 
 import { getNetwork } from './network';
-import { verifyAsset, type AssetVerification } from './assetRegistry';
+import { verifyAsset, type AssetVerification } from './assets';
 import { fetchPrice, usdValue } from './fetchPrice';
 import { fetchContractAssetBalance, fetchContractXlm, getFeePayerAddress } from './activity';
 
