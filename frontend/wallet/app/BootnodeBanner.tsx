@@ -28,7 +28,12 @@ export function BootnodeBanner() {
   }
 
   return (
-    <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 text-center text-sm text-yellow-600 dark:text-yellow-400">
+    <div
+      role="region"
+      aria-label="Bootnode warning"
+      aria-live="polite"
+      className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 text-center text-sm text-yellow-600 dark:text-yellow-400"
+    >
       <span className="font-semibold">Warning:</span> {status.reason}
     </div>
   )
