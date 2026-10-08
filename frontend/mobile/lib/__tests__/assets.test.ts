@@ -11,6 +11,7 @@ import {
   parseHeldAssets,
   USDT0_MAINNET_ISSUER,
   type HorizonBalanceLike,
+  verifiedAsset,
 } from '../assets';
 
 const USDC = {
@@ -200,4 +201,3 @@ describe('Hold USDT0 in mobile: trustline, balance and impostor check (Issue #79
     expect(reg?.issuerName).toBe('Tether');
   });
 });
-

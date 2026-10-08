@@ -3,7 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
 import type { ThemeColors } from '../lib/theme';
-import { formatAssetLabel, verifiedAsset, type HeldAsset } from '../lib/assets';
+import {
+  formatAssetLabel,
+  getRegisteredAsset,
+  isRegisteredIssuer,
+  verifiedAsset,
+  type HeldAsset,
+} from '../lib/assets';
 import { getNetworkName } from '../lib/network';
 import { truncateAddress } from './ui/AddressChip';
 
